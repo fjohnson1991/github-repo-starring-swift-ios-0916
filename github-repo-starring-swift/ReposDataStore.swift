@@ -15,8 +15,8 @@ class ReposDataStore {
     
     var repositories:[GithubRepository] = []
     
-    func getRepositoriesWithCompletion(_ completion: @escaping () -> ()) {
-        GithubAPIClient.getRepositoriesWithCompletion { (reposArray) in
+    func getRepositories(_ completion: @escaping () -> ()) {
+        GithubAPIClient.getRepositories { (reposArray) in
             self.repositories.removeAll()
             for dictionary in reposArray {
                 guard let repoDictionary = dictionary as? [String : Any] else { fatalError("Object in reposArray is of non-dictionary type") }
@@ -27,5 +27,25 @@ class ReposDataStore {
             completion()
         }
     }
-
+    
+    func toggleStarStatus(for gitHubRepository: GithubRepository, starred: @escaping (Bool) -> Void) {
+        
+        GithubAPIClient.checkIfRepositoryIsStarred(fullName: gitHubRepository.fullName, completion: { isStarred in
+            print("inside func")
+            if isStarred == true {
+                print("inside if statement")
+                GithubAPIClient.unstarRepository(named: gitHubRepository.fullName) {
+                    starred(false)
+                }
+            } else {
+                GithubAPIClient.starRepository(named: gitHubRepository.fullName) {
+                    print("went false")
+                    starred(true)
+                }
+            }
+            
+        })
+        
+    }
+    
 }

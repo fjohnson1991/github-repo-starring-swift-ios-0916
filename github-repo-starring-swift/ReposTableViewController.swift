@@ -18,8 +18,9 @@ class ReposTableViewController: UITableViewController {
         self.tableView.accessibilityLabel = "tableView"
         self.tableView.accessibilityIdentifier = "tableView"
         
-        store.getRepositoriesWithCompletion {
-            OperationQueue.main.addOperation({ 
+        store.getRepositories {
+            OperationQueue.main.addOperation({
+                
                 self.tableView.reloadData()
             })
         }
@@ -40,5 +41,34 @@ class ReposTableViewController: UITableViewController {
 
         return cell
     }
-
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        print("\(indexPath.row)")
+        store.toggleStarStatus(for: store.repositories[indexPath.row]) { isStarred in
+            print("INSIDE TOGGLE \n\n\n")
+            if isStarred == true {
+                print("is true")
+                let alert = UIAlertController.customAlertController(title: "Congrats!", message: "You just starred \(self.store.repositories[indexPath.row].fullName)")
+                self.present(alert, animated: true, completion: nil)
+            } else {
+                print("is false")
+                let alert = UIAlertController.customAlertController(title: "Congrats!", message: "You just unstarred \(self.store.repositories[indexPath.row].fullName)")
+                self.present(alert, animated: true, completion: nil)
+            }
+        }
+    }
 }
+
+
+extension UIAlertController {
+    class func customAlertController(title : String, message : String) -> UIAlertController{
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let OKAction = UIAlertAction(title: "OK", style: .default) {
+            (action: UIAlertAction) in print("Youve pressed OK Button")
+        }
+        alertController.addAction(OKAction)
+        return alertController
+    }
+}
+
+
